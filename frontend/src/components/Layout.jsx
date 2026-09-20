@@ -17,9 +17,9 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen bg-[#f1f8ef] landscape:bg-[#eef5eb]">
-      {/* Header — Figma-inspired: white, soft border, green brand + motion-system */}
+      {/* Header — full-width, no side gaps */}
       <header className="sticky top-0 z-20 bg-white border-b border-stone-200 shadow-sm animate-slideDown">
-        <div className="max-w-app landscape:max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        <div className="w-full px-4 lg:px-6 py-3 flex items-center justify-between gap-3">
           <Link to="/" className="flex items-center gap-3 no-underline min-w-0">
             <div className="h-10 w-10 rounded-2xl bg-farm-600 flex items-center justify-center text-xl text-white shadow-sm shrink-0">
               🌾
@@ -49,10 +49,10 @@ export default function Layout({ children }) {
         </div>
       </header>
 
-      {/* Body: sidebar (landscape) + content */}
-      <div className="max-w-app landscape:max-w-5xl mx-auto landscape:flex landscape:items-start landscape:gap-5 landscape:px-4">
+      {/* Body: full-width, no side gaps — sidebar + content */}
+      <div className="w-full px-4 lg:px-6 landscape:flex landscape:items-start landscape:gap-5">
         {/* Sidebar — Figma: white pill active green */}
-        <nav className="hidden landscape:flex landscape:flex-col landscape:gap-1 landscape:w-52 landscape:shrink-0 landscape:sticky landscape:top-[64px] landscape:py-6" aria-label="Primary">
+        <nav className="hidden landscape:flex landscape:flex-col landscape:gap-1 landscape:w-56 landscape:shrink-0 landscape:sticky landscape:top-[64px] landscape:py-6" aria-label="Primary">
           <div className="bg-white rounded-3xl shadow-sm border border-stone-100 p-3 space-y-1">
             {NAV.map((item, idx) => {
               const active = loc.pathname === item.to
@@ -71,12 +71,12 @@ export default function Layout({ children }) {
           </div>
         </nav>
 
-        {/* Content */}
-        <main className="px-4 pt-4 pb-24 landscape:flex-1 landscape:min-w-0 landscape:px-0 landscape:pt-6 landscape:pb-6">{children}</main>
+        {/* Content — full width */}
+        <main className="pt-4 pb-24 landscape:flex-1 landscape:min-w-0 landscape:pt-6 landscape:pb-6 w-full">{children}</main>
       </div>
 
-      {/* Bottom nav — Figma mobile: white bar, green pill active */}
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-app bg-white border-t border-stone-200 px-2 pt-2 pb-[max(8px,env(safe-area-inset-bottom))] z-20 landscape:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
+      {/* Bottom nav — Figma mobile: full-width, no side gaps */}
+      <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-stone-200 px-2 pt-2 pb-[max(8px,env(safe-area-inset-bottom))] z-20 landscape:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.04)]">
         <div className="flex justify-around gap-1">
           {NAV.map(item => {
             const active = loc.pathname === item.to
