@@ -31,7 +31,8 @@ export function browserSpeak(text, lang = 'hi') {
   try {
     speechSynthesis.cancel()
     const u = new SpeechSynthesisUtterance(text.slice(0, 300))
-    u.lang = lang === 'hi' ? 'hi-IN' : lang === 'gu' ? 'gu-IN' : 'en-IN'
+    const map = { hi: 'hi-IN', gu: 'gu-IN', en: 'en-IN', bn: 'bn-IN', ta: 'ta-IN', te: 'te-IN', kn: 'kn-IN', ml: 'ml-IN', pa: 'pa-IN', or: 'or-IN', as: 'as-IN' }
+    u.lang = map[lang] || 'hi-IN'
     speechSynthesis.speak(u)
     return 'browser'
   } catch { return 'none' }

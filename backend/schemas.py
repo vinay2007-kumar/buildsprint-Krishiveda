@@ -15,6 +15,14 @@ class Language(str, Enum):
     ENGLISH = "en"
     HINDI = "hi"
     GUJARATI = "gu"
+    BENGALI = "bn"
+    TAMIL = "ta"
+    TELUGU = "te"
+    KANNADA = "kn"
+    MALAYALAM = "ml"
+    PUNJABI = "pa"
+    ODIA = "or"
+    ASSAMESE = "as"
 
 
 class CropType(str, Enum):

@@ -13,7 +13,8 @@ export default function VoiceButton({ onText, variant = 'primary', compact = fal
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SR) { alert('Voice input not supported in this browser. Please type.') ; return }
     const r = new SR()
-    r.lang = lang === 'hi' ? 'hi-IN' : lang === 'gu' ? 'gu-IN' : 'en-IN'
+    const map = { hi: 'hi-IN', gu: 'gu-IN', en: 'en-IN', bn: 'bn-IN', ta: 'ta-IN', te: 'te-IN', kn: 'kn-IN', ml: 'ml-IN', pa: 'pa-IN', or: 'or-IN', as: 'as-IN' }
+    r.lang = map[lang] || 'hi-IN'
     r.interimResults = false
     r.maxAlternatives = 1
     r.onstart = () => { setListening(true); stopSpeak() }

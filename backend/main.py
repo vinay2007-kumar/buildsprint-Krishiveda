@@ -92,7 +92,7 @@ async def root():
         "status": "running",
         "docs": "/docs",
         "modules": ["disease", "chat", "soil", "weather", "scheme", "voice"],
-        "languages": ["en", "hi", "gu"],
+        "languages": ["en", "hi", "gu", "bn", "ta", "te", "kn", "ml", "pa", "or", "as"],
     }
 
 
@@ -118,12 +118,20 @@ async def list_diseases():
 
 @app.get("/api/languages", tags=["Meta"])
 async def list_languages():
-    """Supported UI / voice languages."""
+    """Supported UI / voice languages — 11 Indian languages."""
     return {
         "success": True,
         "data": [
             {"code": "en", "name": "English", "native": "English"},
             {"code": "hi", "name": "Hindi", "native": "हिंदी"},
             {"code": "gu", "name": "Gujarati", "native": "ગુજરાતી"},
+            {"code": "bn", "name": "Bengali", "native": "বাংলা"},
+            {"code": "ta", "name": "Tamil", "native": "தமிழ்"},
+            {"code": "te", "name": "Telugu", "native": "తెలుగు"},
+            {"code": "kn", "name": "Kannada", "native": "ಕನ್ನಡ"},
+            {"code": "ml", "name": "Malayalam", "native": "മലയാളം"},
+            {"code": "pa", "name": "Punjabi", "native": "ਪੰਜਾਬੀ"},
+            {"code": "or", "name": "Odia", "native": "ଓଡ଼ିଆ"},
+            {"code": "as", "name": "Assamese", "native": "অসমীয়া"},
         ],
     }

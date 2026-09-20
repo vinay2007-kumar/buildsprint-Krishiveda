@@ -32,7 +32,7 @@ async def chat(message: str, language: str = "hi", session_id: Optional[str] = N
     except Exception as e:
         logger.warning("chat LLM failed", error=str(e))
         res = {"source": "fallback", "confidence": 0.4}
-        text = llm_service.fallback_answer(message, language if language in ("en", "hi", "gu") else "hi")
+        text = llm_service.fallback_answer(message, language if language in ("en", "hi", "gu", "bn", "ta", "te", "kn", "ml", "pa", "or", "as") else "hi")
     # Farmer-friendly: cap length for voice readability
     if len(text) > 900:
         text = text[:880].rsplit(".", 1)[0] + "."

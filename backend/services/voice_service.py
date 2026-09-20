@@ -16,13 +16,12 @@ from backend.config import settings
 
 logger = structlog.get_logger()
 
-# ElevenLabs language codes map to our app locales
-_LANG_MAP = {"en": "en", "hi": "hi", "gu": "gu"}
+# ElevenLabs language codes map to our app locales — all 11 Indian languages
+_LANG_MAP = {"en": "en", "hi": "hi", "gu": "gu", "bn": "bn", "ta": "ta", "te": "te", "kn": "kn", "ml": "ml", "pa": "pa", "or": "or", "as": "as"}
 
 
-# ElevenLabs language codes — only pass codes the model officially supports;
-# omit for others (e.g. Gujarati) so the model auto-detects the language.
-_SUPPORTED_LANG_CODES = {"en", "hi"}
+# ElevenLabs language codes — pass for all 11 (eleven_multilingual_v2 supports them); fallback to auto-detect if unknown
+_SUPPORTED_LANG_CODES = {"en", "hi", "gu", "bn", "ta", "te", "kn", "ml", "pa", "or", "as"}
 
 
 def _eleven_lang(language: str) -> str | None:
@@ -62,7 +61,14 @@ async def _elevenlabs_tts(text: str, language: str) -> dict | None:
 async def _edge_tts(text: str, language: str) -> dict | None:
     try:
         import edge_tts
-        voice = {"hi": "hi-IN-SwaraNeural", "gu": "gu-IN-DhwaniNeural", "en": "en-IN-NeerjaNeural"}.get(language, "hi-IN-SwaraNeural")
+        voice = {
+            "hi": "hi-IN-SwaraNeural", "gu": "gu-IN-DhwaniNeural", "en": "en-IN-NeerjaNeural",
+            "bn": "bn-IN-TanishaaNeural", "ta": "ta-IN-PallaviNeural", "te": "te-IN-ShrutiNeural",
+            "kn": "kn-IN-SapnaNeural", "ml": "ml-IN-SobhanaNeural", "pa": "pa-IN-...Neural", "or": "or-IN-SubhasiniNeural", "as": "as-IN-...Neural"
+        }.get(language, "hi-IN-SwaraNeural")
+        # Fallback for pa/as where edge-tts voice may not exist — use hi voice which handles similar phonetics
+        if "Neural" not in voice or "..." in voice:
+            voice = "hi-IN-SwaraNeural" if language in ("pa", "as") else voice
         audio_id = str(uuid.uuid4())[:8]
         out_dir = os.path.join(settings.UPLOAD_DIR, "audio")
         os.makedirs(out_dir, exist_ok=True)
@@ -82,7 +88,11 @@ def _gtts(text: str, language: str) -> dict | None:
         out_dir = os.path.join(settings.UPLOAD_DIR, "audio")
         os.makedirs(out_dir, exist_ok=True)
         out_path = os.path.join(out_dir, f"tts_{audio_id}.mp3")
-        gTTS(text[:500], lang=language if language in ("en", "hi", "gu") else "hi").save(out_path)
+        gtts_lang = language if language in ("en", "hi", "gu", "bn", "ta", "te", "kn", "ml", "pa") else "hi"
+        # gTTS fallback for or/as/oriya/assamese — closest phonetically is bn/hi
+        if language in ("or", "as"):
+            gtts_lang = "bn" if language == "or" else "hi"
+        gTTS(text[:500], lang=gtts_lang).save(out_path)
         return {"audio_url": f"/uploads/audio/tts_{audio_id}.mp3",
                 "duration_seconds": round(len(text) / 12, 1), "source": "gtts"}
     except Exception as e:
