@@ -26,19 +26,28 @@ export function Dashboard() {
   const wxIcon = wx?.current?.condition === 'sunny' ? '☀️' : wx?.current?.condition === 'rainy' ? '🌧️' : '⛅'
   const temp = wx?.current?.temperature != null ? Math.round(wx.current.temperature) : null
 
+  // Human-like time greeting (interfaces-that-feel: warm, time-aware)
+  const hour = new Date().getHours()
+  const timeWarm = hour < 12 ? (lang === 'hi' ? 'सुप्रभात' : lang === 'gu' ? 'સુપ્રભાત' : 'Good morning') : hour < 17 ? (lang === 'hi' ? 'नमस्ते' : lang === 'gu' ? 'નમસ્તે' : 'Good afternoon') : (lang === 'hi' ? 'शुभ संध्या' : lang === 'gu' ? 'શુભ સાંજ' : 'Good evening')
+  const warmMsg = lang === 'hi' ? 'आपकी मेहनत रंग ला रही है — 80% तैयार!' : lang === 'gu' ? 'તમારી મહેનત રંગ લાવી રહી છે!' : "You're doing great — your field is thriving"
+
   return (
     <div className="space-y-4">
-      {/* Greeting — Figma: Olá, João / Bem-vindo de volta */}
-      <div className="px-1">
-        <h1 className="font-bold text-2xl leading-tight text-stone-800">{t.dashHi} 👋</h1>
+      {/* Greeting — human, warm, time-aware */}
+      <div className="px-1 animate-fadeUp">
+        <div className="inline-flex items-center gap-2 text-xs font-medium text-farm-700 bg-farm-50 border border-farm-100 rounded-full px-3 py-1">
+          <span className="h-1.5 w-1.5 bg-farm-500 rounded-full animate-pulseSoft" /> {timeWarm}
+        </div>
+        <h1 className="font-bold text-2xl leading-tight text-stone-800 mt-2">{t.dashHi} <span className="inline-block animate-float" style={{ animationDuration: '3s' }}>👋</span></h1>
         <p className="text-sm text-stone-500 mt-1">{t.dashMsg}</p>
+        <p className="text-xs text-farm-700 bg-amber-50 border border-amber-100 rounded-full inline-block px-2.5 py-1 mt-2">🌱 {warmMsg}</p>
         {location.name && (
           <button
             onClick={() => {
-              const name = prompt('Enter your location (city name):', location.name)
+              const name = prompt(lang === 'hi' ? 'अपना स्थान लिखें:' : 'Enter your location (city name):', location.name)
               if (name && name.trim()) setLocation({ ...location, name: name.trim() })
             }}
-            className="flex items-center gap-1.5 mt-2 text-xs text-stone-500 hover:text-farm-700 transition-colors"
+            className="flex items-center gap-1.5 mt-3 text-xs text-stone-500 hover:text-farm-700 transition-colors duration-fast"
           >
             <span>📍</span><span className="font-medium">{location.name}</span>
             {geoStatus === 'loading' && <span className="h-2 w-2 bg-amber-400 rounded-full animate-pulse" />}
@@ -83,8 +92,12 @@ export function Dashboard() {
                 <div className="text-[11px] text-stone-500 mt-1">Dec 10, 2025</div>
               </div>
             </div>
-            <Link to="/disease" className="flex items-center justify-center gap-2 w-full bg-[#ff6d00] hover:bg-[#e65f00] text-white font-semibold rounded-2xl py-3.5 transition-colors no-underline shadow-sm">
-              <span>📷</span> {t.upload}
+            <div className="flex items-center gap-2 text-xs text-farm-700 bg-farm-50 border border-farm-100 rounded-2xl px-3 py-2 animate-fadeUp" style={{ animationDelay: '0.3s' }}>
+              <span className="text-base">🌱</span>
+              <span className="font-medium">{lang === 'hi' ? 'बहुत बढ़िया! बस थोड़ा और — आपकी मेहनत खिल रही है' : lang === 'gu' ? 'સરસ! થોડું બાકી — તમારી મહેનત ખીલી રહી છે' : "You're 80% there — your hard work is blooming"}</span>
+            </div>
+            <Link to="/disease" className="flex items-center justify-center gap-2 w-full bg-[#ff6d00] hover:bg-[#e65f00] text-white font-semibold rounded-2xl py-3.5 transition-all duration-base ease-standard no-underline shadow-sm hover:shadow-md hover:-translate-y-0.5 pressable will-change-transform">
+              <span className="transition-transform duration-fast group-hover:rotate-3">📷</span> {t.upload}
             </Link>
           </div>
         </Card>
@@ -173,12 +186,12 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Voice CTA — compact */}
-      <Card className="flex items-center gap-3 py-4">
-        <div className="h-10 w-10 rounded-2xl bg-farm-600 flex items-center justify-center text-white">🎤</div>
+      {/* Voice — human, warm (interfaces-that-feel) */}
+      <Card className="flex items-center gap-3 py-4 bg-gradient-to-br from-white to-farm-50/50 border-farm-100 hover-lift">
+        <div className="h-10 w-10 rounded-2xl bg-farm-600 flex items-center justify-center text-white shadow-sm animate-float will-change-transform" style={{ animationDuration: '4s' }}>🎤</div>
         <div className="flex-1 min-w-0">
-          <div className="font-bold text-stone-800 text-sm">{t.voice}</div>
-          <div className="text-xs text-stone-500">{t.tapMic}</div>
+          <div className="font-bold text-stone-800 text-sm">{lang === 'hi' ? 'बात करें — दोस्त जैसे' : lang === 'gu' ? 'વાત કરો — મિત્ર જેમ' : 'Talk to me — like a friend'}</div>
+          <div className="text-xs text-stone-500">{lang === 'hi' ? 'बस बोलें, मैं सुन रहा हूँ' : lang === 'gu' ? 'બસ બોલો, હું સાંભળું છું' : "Just speak, I'm listening"}</div>
         </div>
         <VoiceButton compact onText={txt => navigate('/chat?q=' + encodeURIComponent(txt))} />
       </Card>

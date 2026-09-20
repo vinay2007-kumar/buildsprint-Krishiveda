@@ -69,11 +69,6 @@ export default function Layout({ children }) {
               </Link>
             </div>
           </div>
-          <div className="bg-farm-600 rounded-3xl p-4 text-white mt-3">
-            <div className="text-sm font-bold">🌱 {t.voice}</div>
-            <div className="text-xs text-farm-100 mt-1 leading-snug">{t.tapMic}</div>
-            <div className="mt-3 h-1.5 bg-white/20 rounded-full overflow-hidden"><div className="h-full w-3/4 bg-white rounded-full" /></div>
-          </div>
         </nav>
 
         {/* Content */}
