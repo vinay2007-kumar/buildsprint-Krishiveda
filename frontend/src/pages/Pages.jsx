@@ -9,12 +9,31 @@ import { Badge, Card, CardElevated, IconTile, SCHEME_ICONS, SectionTitle, Skelet
 
 /* ============================== DASHBOARD — Figma AgroShare inspired ============================== */
 export function Dashboard() {
-  const { lang, location, geoStatus, setLocation } = useApp()
+  const { lang, location, geoStatus, setLocation, crop, setCrop } = useApp()
   const navigate = useNavigate()
   const t = STRINGS[lang]
   const [wx, setWx] = useState(null)
 
   useEffect(() => { Api.weather(location.lat, location.lon, location.name).then(r => setWx(r.data || r)).catch(() => {}) }, [location.lat, location.lon])
+
+  // 12 crops — not only maize
+  const CROPS = [
+    { id: 1, name: 'wheat', hi: 'गेहूं', gu: 'ઘઉં', icon: '🌾', progress: 80, area: '10' },
+    { id: 2, name: 'rice', hi: 'धान', gu: 'ડાંગર', icon: '🌾', progress: 65, area: '8' },
+    { id: 3, name: 'maize', hi: 'मक्का', gu: 'મકાઈ', icon: '🌽', progress: 80, area: '10' },
+    { id: 4, name: 'cotton', hi: 'कपास', gu: 'કપાસ', icon: '🌿', progress: 45, area: '6' },
+    { id: 5, name: 'sugarcane', hi: 'गन्ना', gu: 'શેરડી', icon: '🎋', progress: 70, area: '12' },
+    { id: 6, name: 'soybean', hi: 'सोयाबीन', gu: 'સોયાબીન', icon: '🌱', progress: 55, area: '7' },
+    { id: 7, name: 'groundnut', hi: 'मूंगफली', gu: 'મગફળી', icon: '🥜', progress: 60, area: '5' },
+    { id: 8, name: 'mustard', hi: 'सरसों', gu: 'સરસવ', icon: '🌼', progress: 75, area: '4' },
+    { id: 9, name: 'tomato', hi: 'टमाटर', gu: 'ટામેટા', icon: '🍅', progress: 50, area: '3' },
+    { id: 10, name: 'potato', hi: 'आलू', gu: 'બટાટા', icon: '🥔', progress: 68, area: '4' },
+    { id: 11, name: 'onion', hi: 'प्याज', gu: 'ડુંગળી', icon: '🧅', progress: 52, area: '3' },
+    { id: 12, name: 'chilli', hi: 'मिर्च', gu: 'મરચું', icon: '🌶️', progress: 58, area: '2' },
+  ]
+  const selected = CROPS.find(c => c.name === crop) || CROPS[2]
+  const cropLabel = lang === 'hi' ? selected.hi : lang === 'gu' ? selected.gu : selected.name
+  const areaLabel = lang === 'hi' ? `${selected.area} हेक्टेयर` : lang === 'gu' ? `${selected.area} હેક્ટર` : `${selected.area} hectares`
 
   const cards = [
     { to: '/chat', icon: '💬', label: t.ask, sub: t.subAsk, tone: 'farm' },
@@ -56,26 +75,41 @@ export function Dashboard() {
         )}
       </div>
 
-      {/* Top grid — Figma: Minha Plantação (left) + Clima Atual (right, dark green) */}
+      {/* Crop selector — 12 crops, not only maize */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-bold text-stone-800">{lang === 'hi' ? 'मेरी फसलें' : lang === 'gu' ? 'મારા પાકો' : 'My Crops'} <span className="text-xs font-normal text-stone-500">• {CROPS.length}</span></h3>
+          <span className="text-xs text-farm-600 font-medium">{cropLabel} ✓</span>
+        </div>
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
+          {CROPS.map(c => (
+            <button key={c.id} onClick={() => setCrop(c.name)} className={`chip shrink-0 transition-all duration-fast ${crop === c.name ? 'active shadow-sm' : 'bg-white hover:border-farm-200'}`}>
+              <span>{c.icon}</span> {lang === 'hi' ? c.hi : lang === 'gu' ? c.gu : c.name}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Top grid — plantation (dynamic crop) + weather */}
       <div className="grid gap-3 landscape:grid-cols-5">
-        {/* Plantation card */}
-        <Card className="landscape:col-span-3 p-0 overflow-hidden">
+        {/* Plantation card — dynamic */}
+        <Card className="landscape:col-span-3 p-0 overflow-hidden animate-cardEntrance">
           <div className="p-4 pb-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-bold text-stone-800">🌾 {t.plantation || t.soil}</h3>
-              <span className="text-xs bg-farm-50 text-farm-700 px-2.5 py-1 rounded-full font-medium">80% • {t.progressLabel || 'Progress'}</span>
+              <h3 className="font-bold text-stone-800">{selected.icon} {cropLabel}</h3>
+              <span className="text-xs bg-farm-50 text-farm-700 px-2.5 py-1 rounded-full font-medium">{selected.progress}% • {t.progressLabel || 'Progress'}</span>
             </div>
           </div>
           <div className="px-4">
             <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-emerald-100 to-amber-50 border border-stone-100 relative h-36">
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
-                  <div className="text-4xl">🌽</div>
-                  <div className="text-xs font-bold text-stone-700 mt-1 bg-white/80 backdrop-blur px-3 py-1 rounded-full">{t.maizeLabel || 'Maize • 10 hectares'}</div>
+                  <div className="text-4xl">{selected.icon}</div>
+                  <div className="text-xs font-bold text-stone-700 mt-1 bg-white/80 backdrop-blur px-3 py-1 rounded-full">{cropLabel} • {areaLabel}</div>
                 </div>
               </div>
               <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-stone-200">
-                <div className="h-full w-[80%] bg-farm-600 rounded-full" />
+                <div className="h-full bg-farm-600 rounded-full transition-all duration-moderate ease-standard" style={{ width: `${selected.progress}%` }} />
               </div>
             </div>
           </div>
@@ -83,8 +117,8 @@ export function Dashboard() {
             <div className="flex gap-3">
               <div className="flex-1 bg-amber-50 border border-amber-100 rounded-2xl p-3 hover-lift transition-all duration-base">
                 <div className="text-xs text-stone-500">{t.harvestProgress || 'Harvest Progress'}</div>
-                <div className="text-sm font-bold text-stone-800 mt-0.5">80%</div>
-                <div className="mt-2 h-1.5 bg-white rounded-full overflow-hidden"><div className="h-full w-[80%] bg-farm-600 rounded-full origin-left animate-barGrow" style={{ animationDelay: '0.2s' }} /></div>
+                <div className="text-sm font-bold text-stone-800 mt-0.5">{selected.progress}%</div>
+                <div className="mt-2 h-1.5 bg-white rounded-full overflow-hidden"><div className="h-full bg-farm-600 rounded-full origin-left animate-barGrow" style={{ width: `${selected.progress}%`, animationDelay: '0.2s' }} /></div>
               </div>
               <div className="flex-1 bg-farm-50 border border-farm-100 rounded-2xl p-3 hover-lift transition-all duration-base" style={{ animationDelay: '0.05s' }}>
                 <div className="text-xs text-stone-500">{t.harvestIn || 'Harvest in'}</div>
