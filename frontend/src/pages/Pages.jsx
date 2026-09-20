@@ -233,7 +233,37 @@ export function Dashboard() {
   )
 }
 
-/* ============================== CHAT ============================== */
+/* ============================== CHAT — continuous relevant suggestions ============================== */
+function getRelevantSuggestions({ lang, crop, lastQ = '', lastA = '', t }) {
+  const q = (lastQ + ' ' + lastA).toLowerCase()
+  const c = (crop || 'wheat').toLowerCase()
+  // Crop-specific pools (localized via t where possible)
+  const cropQs = {
+    wheat: t.suggestions,
+    rice: lang === 'hi' ? ['धान में पानी कितना?', 'राइस ब्लास्ट क्या है?', 'खरपतवार कैसे रोकें?'] : lang === 'gu' ? ['ડાંગરમાં પાણી કેટલું?', 'રાઇસ બ્લાસ્ટ શું?', 'નિંદામણ કેવી રીતે રોકવું?'] : ['How much water for rice?', 'What is rice blast?', 'How to control weeds in rice?'],
+    maize: lang === 'hi' ? ['मक्का में खाद कब?', 'मक्का कीट कैसे रोकें?', 'सिंचाई कितनी?'] : lang === 'gu' ? ['મકાઈમાં ખાતર ક્યારે?', 'મકાઈના જીવાત કેવી રીતે રોકવા?', 'સિંચાઈ કેટલી?'] : ['When to fertilize maize?', 'How to control maize pests?', 'How much irrigation for maize?'],
+    tomato: lang === 'hi' ? ['टमाटर में कौन सी खाद?', 'टमाटर पत्ती मुरझा रही?', 'टमाटर में पानी?'] : lang === 'gu' ? ['ટામેટામાં કયું ખાતર?', 'ટામેટાના પાન કરમાય છે?', 'ટામેટામાં પાણી?'] : ['What fertilizer for tomato?', 'Tomato leaves wilting?', 'Water for tomato?'],
+  }
+  // Keyword-based follow-ups
+  if (q.includes('yellow') || q.includes('पीला') || q.includes('પીળ') || q.includes('হলুদ') || q.includes('மஞ்சள்')) {
+    return lang === 'hi' ? ['कितना यूरिया डालें?', 'पानी रोकें या बढ़ाएं?', 'क्या फंगस है?'] : lang === 'gu' ? ['કેટલું યુરિયા નાખવું?', 'પાણી રોકવું કે વધારવું?', 'શું ફૂગ છે?'] : ['How much urea?', 'Stop or increase water?', 'Is it fungal?']
+  }
+  if (q.includes('fertiliz') || q.includes('खाद') || q.includes('ખાતર') || q.includes('সার') || q.includes('உரம்')) {
+    return lang === 'hi' ? ['मिट्टी pH क्या है?', 'जैविक खाद बताएं', 'कब डालें?'] : lang === 'gu' ? ['માટી pH શું છે?', 'જૈવિક ખાતર કહો', 'ક્યારે નાખવું?'] : ['What is soil pH?', 'Suggest organic fertilizer', 'When to apply?']
+  }
+  if (q.includes('rain') || q.includes('बारिश') || q.includes('વરસાદ') || q.includes('বৃষ্টি') || q.includes('மழை')) {
+    return lang === 'hi' ? ['सिंचाई कब रोकें?', 'जल निकासी कैसे?', 'कटाई कब करें?'] : lang === 'gu' ? ['સિંચાઈ ક્યારે રોકવી?', 'પાણી નિકાલ કેવી રીતે?', 'લણણી ક્યારે?'] : ['When to stop irrigation?', 'How to drain field?', 'When to harvest?']
+  }
+  if (q.includes('disease') || q.includes('रोग') || q.includes('રોગ') || q.includes('রোগ')) {
+    return lang === 'hi' ? ['कौन सी दवा छिड़कें?', 'रोकथाम कैसे?', 'फोटो से जांचें?'] : lang === 'gu' ? ['કઈ દવા છાંટવી?', 'અટકાવ કેવી રીતે?', 'ફોટાથી તપાસો?'] : ['Which spray to use?', 'How to prevent?', 'Check via photo?']
+  }
+  // Default: crop-specific + generic
+  const pool = cropQs[c] || cropQs.wheat
+  // Ensure 3, rotate based on lastQ length for variety
+  const offset = lastQ.length % Math.max(1, pool.length - 2)
+  return pool.slice(offset, offset + 3).length === 3 ? pool.slice(offset, offset + 3) : pool.slice(0, 3)
+}
+
 export function ChatAssistant() {
   const { lang, crop, location } = useApp()
   const t = STRINGS[lang]
@@ -242,9 +272,11 @@ export function ChatAssistant() {
   const [msgs, setMsgs] = useState([{ role: 'assistant', text: t.chatGreet }])
   const [inp, setInp] = useState(query || '')
   const [busy, setBusy] = useState(false)
+  const [suggestions, setSuggestions] = useState(t.suggestions)
   const endRef = useRef(null)
 
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [msgs, busy])
+  useEffect(() => { setSuggestions(t.suggestions) }, [lang, crop])
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [msgs, busy, suggestions])
   useEffect(() => { if (query) send(query) }, []) // eslint-disable-line
 
   const send = async (text) => {
@@ -255,6 +287,8 @@ export function ChatAssistant() {
     const res = await Api.chat(q, lang, { crop, location: location?.name })
     const answer = res.response || res.data?.response || 'Error'
     setMsgs(m => [...m.slice(0, -1), { role: 'assistant', text: answer }])
+    // Update relevant suggestions continuously
+    setSuggestions(getRelevantSuggestions({ lang, crop, lastQ: q, lastA: answer, t }))
     try { await speakText(answer, lang) } catch {}
     setBusy(false)
   }
@@ -272,11 +306,10 @@ export function ChatAssistant() {
         ))}
         <div ref={endRef} />
       </div>
-      {msgs.length === 1 && (
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
-          {t.suggestions.map(s => <button key={s} onClick={() => send(s)} className="chip shrink-0 bg-white">{s}</button>)}
-        </div>
-      )}
+      {/* Continuous relevant suggestions */}
+      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 -mx-1 px-1">
+        {suggestions.map(s => <button key={s} onClick={() => send(s)} disabled={busy} className="chip shrink-0 bg-white hover:border-farm-300 hover:text-farm-700 disabled:opacity-50 transition-colors">{s}</button>)}
+      </div>
       <div className="flex gap-2 items-end bg-white rounded-3xl border border-stone-200 p-2 shadow-sm">
         <VoiceButton compact variant="secondary" onText={send} />
         <input className="flex-1 bg-transparent px-3 py-2.5 text-base outline-none placeholder:text-stone-400" value={inp} onChange={e => setInp(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} placeholder={t.chatPlaceholder || 'Ask...'} />
