@@ -1,0 +1,39 @@
+# FastAPI core
+fastapi
+uvicorn[standard]
+pydantic>=2.0
+pydantic-settings
+python-multipart
+python-dotenv
+structlog
+
+# Database (SQLite dev, PostgreSQL prod)
+sqlalchemy>=2.0
+aiosqlite
+asyncpg
+alembic
+
+# HTTP + utils
+httpx
+requests
+pillow
+numpy
+python-jose[cryptography]
+passlib[bcrypt]
+
+# PDF / RAG (install as needed)
+pypdf
+pdfplumber
+chromadb
+sentence-transformers
+
+# Voice (optional - backend falls back to browser APIs if missing)
+# faster-whisper
+# edge-tts
+# gTTS
+# SpeechRecognition
+# pydub
+
+# LLM
+huggingface_hub
+openai

@@ -1,0 +1,1 @@
+"""Static agricultural reference data."""

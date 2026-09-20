@@ -1,0 +1,1 @@
+"""KrishiVeda backend package."""

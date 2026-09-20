@@ -1,0 +1,503 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: theme('fontFamily.sans');
+    background: theme('colors.farm.50');
+    color: theme('colors.stone.900');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  /* Respect reduced-motion (motion-system skill) */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+  :focus-visible {
+    outline: 2px solid theme('colors.farm.500');
+    outline-offset: 2px;
+  }
+  /* Selection styling */
+  ::selection {
+    background: theme('colors.farm.200');
+    color: theme('colors.farm.900');
+  }
+}
+
+@layer components {
+  /* ===================================================================
+     LAYOUT PRIMITIVES
+     =================================================================== */
+
+  /* Page container - centered, responsive max-width */
+  .page {
+    @apply min-h-screen max-w-app mx-auto px-4 pb-20 landscape:max-w-5xl landscape:pb-6 landscape:px-6;
+  }
+
+  /* Section spacing (law-of-proximity: larger gaps between sections) */
+  .section {
+    @apply space-y-4 py-4;
+  }
+
+  /* ===================================================================
+     SURFACES / CARDS (law-of-common-region: explicit containers)
+     =================================================================== */
+
+  .card {
+    @apply bg-white rounded-3xl shadow-card p-5 animate-fadeUp border border-stone-100;
+  }
+
+  .card-elevated {
+    @apply bg-white rounded-3xl shadow-elevated p-5 animate-fadeUp border border-stone-100;
+  }
+
+  .card-tight {
+    @apply bg-white rounded-2xl shadow-card p-4;
+  }
+
+  .card-glass {
+    @apply bg-white/80 backdrop-blur-md rounded-3xl shadow-card p-5 animate-fadeUp border border-white/50;
+  }
+
+  .card-gradient {
+    @apply bg-gradient-to-br from-farm-600 to-farm-800 text-white rounded-3xl shadow-elevated p-5 animate-fadeUp border-0;
+  }
+
+  .card-gradient-sky {
+    @apply bg-gradient-to-br from-sky-600 to-sky-800 text-white rounded-3xl shadow-elevated p-5 animate-fadeUp border-0;
+  }
+
+  .card-gradient-amber {
+    @apply bg-gradient-to-br from-amber-500 to-amber-700 text-white rounded-3xl shadow-elevated p-5 animate-fadeUp border-0;
+  }
+
+  /* ===================================================================
+     BUTTONS (feedback-patterns: immediate state change, active scale)
+     =================================================================== */
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 font-semibold rounded-2xl px-5 py-3.5
+           transition-all duration-fast active:scale-[0.97] disabled:opacity-50 disabled:pointer-events-none select-none;
+  }
+
+  .btn-primary {
+    @apply btn bg-farm-600 text-white hover:bg-farm-700 focus:ring-2 focus:ring-farm-500 focus:ring-offset-2 shadow-card;
+  }
+
+  .btn-secondary {
+    @apply btn bg-farm-100 text-farm-800 hover:bg-farm-200 focus:ring-2 focus:ring-farm-400 focus:ring-offset-2;
+  }
+
+  .btn-amber {
+    @apply btn bg-amber-500 text-white hover:bg-amber-600 focus:ring-2 focus:ring-amber-400 focus:ring-offset-2 shadow-card;
+  }
+
+  .btn-danger {
+    @apply btn bg-danger-500 text-white hover:bg-danger-600 focus:ring-2 focus:ring-danger-400 focus:ring-offset-2 shadow-card;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-farm-700 hover:bg-farm-50 focus:ring-2 focus:ring-farm-400 focus:ring-offset-2;
+  }
+
+  .btn-dark {
+    @apply btn bg-farm-900 text-white hover:bg-farm-800 focus:ring-2 focus:ring-farm-700 focus:ring-offset-2 shadow-card;
+  }
+
+  .btn-outline {
+    @apply btn border-2 border-farm-600 text-farm-700 hover:bg-farm-50 focus:ring-2 focus:ring-farm-400 focus:ring-offset-2;
+  }
+
+  .btn-soft {
+    @apply btn bg-farm-50 text-farm-700 hover:bg-farm-100 focus:ring-2 focus:ring-farm-400 focus:ring-offset-2;
+  }
+
+  /* Icon buttons */
+  .btn-icon {
+    @apply p-2.5 rounded-xl transition-colors duration-fast active:scale-95 disabled:opacity-50;
+  }
+  .btn-icon-primary { @apply btn-icon text-farm-600 hover:bg-farm-100; }
+  .btn-icon-neutral { @apply btn-icon text-stone-500 hover:bg-stone-100; }
+  .btn-icon-danger { @apply btn-icon text-danger-500 hover:bg-danger-50; }
+
+  /* ===================================================================
+     FORM FIELDS (form-design skill)
+     =================================================================== */
+
+  .input {
+    @apply w-full p-3.5 rounded-2xl border-2 border-stone-200 bg-white text-base
+           placeholder:text-stone-400 focus:border-farm-500 focus:ring-2 focus:ring-farm-500/20 outline-none transition-all duration-fast;
+  }
+
+  .input-error {
+    @apply border-danger-400 focus:border-danger-500 focus:ring-danger-500/20;
+  }
+
+  .input-label {
+    @apply block text-sm font-semibold text-stone-700 mb-1.5;
+  }
+
+  .input-hint {
+    @apply text-xs text-stone-500 mt-1;
+  }
+
+  .input-error-text {
+    @apply text-xs text-danger-600 mt-1 flex items-center gap-1;
+  }
+
+  .select {
+    width: 100%;
+    padding: 0.875rem;
+    border-radius: 1.125rem;
+    border: 2px solid #e7e5e4;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2378716c' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1.25rem;
+    font-size: 1rem;
+    color: #1c1917;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline: none;
+    transition: all 120ms ease;
+    padding-right: 2.5rem;
+  }
+  .select:focus {
+    border-color: #2E8B57;
+    box-shadow: 0 0 0 4px rgba(46, 139, 87, 0.12);
+  }
+
+  .textarea {
+    @apply w-full p-3.5 rounded-2xl border-2 border-stone-200 bg-white text-base
+           placeholder:text-stone-400 focus:border-farm-500 focus:ring-2 focus:ring-farm-500/20 outline-none transition-all duration-fast resize-y min-h-[100px];
+  }
+
+  /* ===================================================================
+     CHIPS / TAGS (filter controls, tags)
+     =================================================================== */
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border-2 border-stone-200
+           text-sm font-medium text-stone-600 bg-white transition-all duration-fast cursor-pointer;
+  }
+
+  .chip.active {
+    @apply border-farm-600 bg-farm-600 text-white shadow-soft;
+  }
+
+  .chip:hover:not(.active) {
+    @apply border-farm-300 bg-farm-50 text-farm-800;
+  }
+
+  .chip-outline {
+    @apply chip bg-transparent;
+  }
+
+  .chip-outline.active {
+    @apply bg-farm-600 text-white border-farm-600;
+  }
+
+  .tag {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+
+  .tag-farm { @apply tag bg-farm-100 text-farm-700; }
+  .tag-success { @apply tag bg-success-100 text-success-700; }
+  .tag-warn { @apply tag bg-warn-100 text-warn-700; }
+  .tag-danger { @apply tag bg-danger-100 text-danger-700; }
+  .tag-info { @apply tag bg-info-100 text-info-700; }
+  .tag-stone { @apply tag bg-stone-100 text-stone-700; }
+
+  /* ===================================================================
+     BADGES (status feedback)
+     =================================================================== */
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold;
+  }
+
+  .badge-green { @apply badge bg-success-100 text-success-800; }
+  .badge-amber { @apply badge bg-warn-100 text-warn-800; }
+  .badge-red { @apply badge bg-danger-100 text-danger-800; }
+  .badge-blue { @apply badge bg-info-100 text-info-800; }
+  .badge-neutral { @apply badge bg-stone-200 text-stone-700; }
+  .badge-farm { @apply badge bg-farm-100 text-farm-800; }
+
+  /* ===================================================================
+     NAVIGATION
+     =================================================================== */
+
+  /* Bottom nav (portrait only) */
+  .nav-bottom {
+    @apply fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-app bg-white/95 backdrop-blur border-t border-stone-200 px-3 pt-2 pb-[max(8px,env(safe-area-inset-bottom))] z-20 landscape:hidden;
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center gap-0.5 flex-1 py-2 rounded-2xl text-stone-500
+           transition-all duration-fast no-underline active:scale-95;
+  }
+
+  .nav-item.active {
+    @apply bg-farm-100 text-farm-700 font-semibold;
+  }
+
+  .nav-item:hover:not(.active) {
+    @apply text-farm-600 bg-farm-50;
+  }
+
+  /* Sidebar nav (landscape only) */
+  .sidebar {
+    @apply hidden landscape:flex landscape:flex-col landscape:gap-1 landscape:w-56 landscape:shrink-0 landscape:sticky landscape:top-[72px] landscape:py-4 landscape:px-2;
+  }
+
+  .side-item {
+    @apply flex items-center gap-3 px-3.5 py-3 rounded-2xl text-sm font-semibold text-stone-600
+           transition-all duration-fast no-underline active:scale-[0.98];
+  }
+
+  .side-item.active {
+    @apply bg-farm-600 text-white shadow-soft;
+  }
+
+  .side-item:hover:not(.active) {
+    @apply bg-farm-100 text-farm-800;
+  }
+
+  /* Header */
+  .header {
+    @apply sticky top-0 z-20 bg-farm-900/95 backdrop-blur border-b border-farm-800 text-white shadow-soft;
+  }
+
+  .header-inner {
+    @apply px-4 py-3 flex items-center justify-between gap-3;
+  }
+
+  /* ===================================================================
+     ICON TILES (quick action branding)
+     =================================================================== */
+
+  .icon-tile {
+    @apply flex items-center justify-center shadow-soft rounded-2xl;
+  }
+
+  .icon-tile-lg { @apply icon-tile h-14 w-14 text-3xl; }
+  .icon-tile-md { @apply icon-tile h-12 w-12 text-2xl; }
+  .icon-tile-sm { @apply icon-tile h-10 w-10 text-xl; }
+
+  .icon-tile-farm { @apply bg-gradient-to-br from-farm-500 to-farm-700; }
+  .icon-tile-sky { @apply bg-gradient-to-br from-sky-500 to-sky-700; }
+  .icon-tile-amber { @apply bg-gradient-to-br from-amber-500 to-amber-700; }
+  .icon-tile-violet { @apply bg-gradient-to-br from-violet-500 to-violet-700; }
+  .icon-tile-rose { @apply bg-gradient-to-br from-rose-500 to-rose-700; }
+  .icon-tile-emerald { @apply bg-gradient-to-br from-emerald-500 to-emerald-700; }
+  .icon-tile-orange { @apply bg-gradient-to-br from-orange-500 to-orange-700; }
+  .icon-tile-teal { @apply bg-gradient-to-br from-teal-500 to-teal-700; }
+
+  /* ===================================================================
+     SECTION TITLES (visual-hierarchy: secondary level)
+     =================================================================== */
+
+  .section-title {
+    @apply text-sm font-bold uppercase tracking-caption text-stone-500 mb-3 flex items-center gap-2;
+  }
+
+  .section-title-icon {
+    @apply text-lg;
+  }
+
+  /* ===================================================================
+     SKELETON LOADERS (loading-states skill)
+     =================================================================== */
+
+  .skeleton {
+    @apply rounded-xl bg-stone-200 relative overflow-hidden;
+    background-image: linear-gradient(90deg, #e7e5e4 0px, #f5f5f4 40px, #e7e5e4 80px);
+    background-size: 400px 100%;
+    background-repeat: no-repeat;
+    animation: shimmer 1.4s linear infinite;
+  }
+
+  .skeleton-text {
+    @apply skeleton h-4 w-full;
+  }
+
+  .skeleton-title {
+    @apply skeleton h-6 w-3/4;
+  }
+
+  .skeleton-avatar {
+    @apply skeleton rounded-full h-10 w-10;
+  }
+
+  .skeleton-card {
+    @apply skeleton rounded-2xl h-32;
+  }
+
+  .skeleton-circle {
+    @apply skeleton rounded-full;
+  }
+
+  /* ===================================================================
+     TYPING INDICATOR (loading-states skill)
+     =================================================================== */
+
+  .typing-indicator {
+    @apply inline-flex gap-1 py-1.5;
+  }
+
+  .typing-dot {
+    @apply w-2 h-2 rounded-full bg-stone-400 inline-block;
+    animation: typingBounce 1.2s infinite ease-in-out;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes typingBounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  /* ===================================================================
+     TOASTS (feedback-patterns skill)
+     =================================================================== */
+
+  .toast {
+    @apply px-4 py-3 rounded-2xl border shadow-lift animate-pop max-w-md text-sm font-medium;
+  }
+
+  .toast-success { @apply toast bg-success-100 text-success-800 border-success-300; }
+  .toast-error { @apply toast bg-danger-100 text-danger-800 border-danger-300; }
+  .toast-info { @apply toast bg-info-100 text-info-800 border-info-300; }
+  .toast-warn { @apply toast bg-warn-100 text-warn-800 border-warn-300; }
+
+  /* ===================================================================
+     AVATARS
+     =================================================================== */
+
+  .avatar {
+    @apply inline-flex items-center justify-center rounded-2xl font-bold;
+  }
+
+  .avatar-xl { @apply avatar h-14 w-14 text-xl; }
+  .avatar-lg { @apply avatar h-12 w-12 text-lg; }
+  .avatar-md { @apply avatar h-10 w-10 text-base; }
+  .avatar-sm { @apply avatar h-8 w-8 text-sm; }
+  .avatar-xs { @apply avatar h-6 w-6 text-xs; }
+
+  .avatar-farm { @apply bg-farm-100 text-farm-700; }
+  .avatar-sky { @apply bg-sky-100 text-sky-700; }
+  .avatar-amber { @apply bg-amber-100 text-amber-700; }
+  .avatar-violet { @apply bg-violet-100 text-violet-700; }
+  .avatar-rose { @apply bg-rose-100 text-rose-700; }
+  .avatar-success { @apply bg-success-100 text-success-700; }
+  .avatar-stone { @apply bg-stone-200 text-stone-700; }
+
+  /* ===================================================================
+     DIVIDERS
+     =================================================================== */
+
+  .divider {
+    @apply border-t border-stone-200 my-4;
+  }
+
+  .divider-dashed {
+    @apply border-t-2 border-dashed border-stone-200 my-4;
+  }
+
+  /* ===================================================================
+     UTILITIES
+     =================================================================== */
+
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+
+  /* Scrollbar styling */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.farm.300') transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background-color: theme('colors.farm.300'); border-radius: 3px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover { background-color: theme('colors.farm.400'); }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Truncate utilities */
+  .truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .truncate-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Glassmorphism */
+  .glass {
+    @apply bg-white/70 backdrop-blur-md border border-white/50;
+  }
+
+  .glass-dark {
+    @apply bg-farm-900/70 backdrop-blur-md border border-farm-800/50;
+  }
+
+  /* Gradient text */
+  .text-gradient-farm {
+    @apply bg-gradient-to-r from-farm-600 to-farm-800 bg-clip-text text-transparent;
+  }
+
+  .text-gradient-sky {
+    @apply bg-gradient-to-r from-sky-600 to-sky-800 bg-clip-text text-transparent;
+  }
+}
+
+@layer utilities {
+  /* Safe area insets for mobile */
+  .safe-top { padding-top: env(safe-area-inset-top); }
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-left { padding-left: env(safe-area-inset-left); }
+  .safe-right { padding-right: env(safe-area-inset-right); }
+
+  /* Animation delays for stagger (motion-system: 30-50ms) */
+  .delay-1 { animation-delay: 0.04s; }
+  .delay-2 { animation-delay: 0.08s; }
+  .delay-3 { animation-delay: 0.12s; }
+  .delay-4 { animation-delay: 0.16s; }
+  .delay-5 { animation-delay: 0.20s; }
+  .delay-6 { animation-delay: 0.24s; }
+  .stagger-1 { animation-delay: 0.03s; }
+  .stagger-2 { animation-delay: 0.06s; }
+  .stagger-3 { animation-delay: 0.09s; }
+  .stagger-4 { animation-delay: 0.12s; }
+
+  /* Hover lift (micro-interaction-spec: feedback) */
+  .hover-lift { @apply transition-all duration-base ease-standard hover:-translate-y-0.5 hover:shadow-card; }
+  .hover-lift-lg { @apply transition-all duration-moderate ease-standard hover:-translate-y-1 hover:shadow-elevated; }
+  .pressable { @apply active:scale-[0.97] transition-transform duration-instant ease-standard; }
+  .will-change-transform { will-change: transform; }
+
+  /* Focus ring (accessibility) */
+  .focus-ring { @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 focus-visible:ring-offset-2; }
+
+  /* Touch target minimum 44px (platform-conventions) */
+  .touch-target { @apply min-h-[44px] min-w-[44px]; }
+
+  /* Hide scrollbar but allow scroll */
+  .scrollbar-hide { @apply no-scrollbar; }
+
+  /* Reduced motion helpers */
+  @media (prefers-reduced-motion: reduce) {
+    .hover-lift, .hover-lift-lg { @apply hover:translate-y-0 hover:shadow-none; }
+  }
+}
